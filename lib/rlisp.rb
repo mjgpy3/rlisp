@@ -1,1 +1,2 @@
-Rlisp = nil
+def Rlisp
+end
