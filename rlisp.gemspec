@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ['Michael "Gilli" Gilliland']
   s.homepage = 'https://github.com/mjgpy3/rlisp'
-  s.date = '2014-22-14'
+  s.date = '2014-07-18'
   s.summary = 'A lisp-like DSL for ruby, yay!'
   s.description = 'Your wildest dreams have come true! Lisp within ruby!'
   s.files = ['README.md']
