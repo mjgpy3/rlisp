@@ -23,12 +23,12 @@ class CustomMethod
     @array[3]
   end
 
-  def name
-    @array[1]
-  end
-
   def lookups
     @lookups
+  end
+
+  def name
+    @array[1]
   end
 end
 
@@ -50,7 +50,7 @@ class RlispExecutor
     @available_methods = OPERATIONS.clone
   end
 
-  def execute(to_execute)
+  def execute(to_execute, lookups = {})
     return to_execute unless to_execute.is_a?(Array)
     return to_execute[1] if QUOTES.include?(to_execute.first)
     op = to_execute.first
@@ -61,20 +61,23 @@ class RlispExecutor
       return
     end
 
-    all = execute_elements(to_execute)
+    all = execute_elements(to_execute, lookups)
 
     return OPERATIONS[op].(all) if OPERATIONS.include?(op)
-    return @available_methods[op].(all) if @available_methods.include?(op)
-    return execute(all.first) if all.size == 1
+    method = @available_methods[op]
+    return execute(method.(all), method.lookups) if method
+    return execute(all.first, lookups) if all.size == 1
+
+    all.map! { |x| lookups.include?(x) ? lookups[x] : x}
 
     SIMPLE_SEND.(all)
   end
 
   private
 
-  def execute_elements(array)
+  def execute_elements(array, lookups)
     array.
-      map { |i| i.is_a?(Array) ? execute(i) : i }.
+      map { |i| i.is_a?(Array) ? execute(i, lookups) : i }.
       select { |x| x }
   end
 end

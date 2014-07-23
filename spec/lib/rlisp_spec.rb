@@ -36,7 +36,7 @@ describe '#Rlisp' do
     context 'and that function is passed 21' do
       let(:value) { 21 }
 
-      xit { is_expected.to eq(42) }
+      it { is_expected.to eq(42) }
     end
   end
 
