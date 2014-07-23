@@ -8,7 +8,11 @@ Gem::Specification.new do |s|
   s.date = '2014-07-18'
   s.summary = 'A lisp-like DSL for ruby, yay!'
   s.description = 'Your wildest dreams have come true! Lisp within ruby!'
-  s.files = ['README.md']
+  s.files = ['./lib/rlisp.rb',
+    './spec/spec_helper.rb',
+    './spec/lib/rlisp_spec.rb',
+    './README.md',
+    './rlisp.gemspec']
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'rubocop'
 end
