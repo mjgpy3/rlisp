@@ -17,9 +17,32 @@ describe '#Rlisp' do
     specify { expect { subject }.to_not raise_error }
 
     context 'with a ruby string' do
-      let(:thing_to_print) { "Hello world\n" }
+      let(:thing_to_print) { "Hello world" }
 
-      specify { expect { subject }.to output(thing_to_print).to_stdout }
+      specify { expect { subject }.to output(thing_to_print+"\n").to_stdout }
+    end
+  end
+
+  context 'when executing a math operation' do
+    subject { Rlisp { math_operation } }
+
+    context 'and that operation being [:+, 21, 21]' do
+      let(:math_operation) { [:+, 21, 21] }
+
+      it { is_expected.to eq(42) }
+    end
+  end
+
+  [
+    'foobar',
+    Object.new,
+    {},
+    42
+  ].each do |thing|
+    context "when executing a non-`Array` that is `#{thing.inspect}`" do
+      subject { Rlisp { thing } }
+
+      specify { expect { subject }.to raise_error }
     end
   end
 end
