@@ -35,6 +35,7 @@ end
 class RlispExecutor
   SIMPLE_SEND = ->(x){ x[1].send(x.first, *x[2..-1]) }
   SIMPLE_SEND_MAPPED = ->(m, x){ SIMPLE_SEND.([m] + x[1..-1]) }
+  QUOTES = [:quote, :`]
 
   OPERATIONS = {
     mod: ->(x){ SIMPLE_SEND.([:%] + x[1..-1]) },
@@ -46,12 +47,12 @@ class RlispExecutor
   }
 
   def initialize
-    @available_methods = OPERATIONS
+    @available_methods = OPERATIONS.clone
   end
 
   def execute(to_execute)
     return to_execute unless to_execute.is_a?(Array)
-    return to_execute[1] if [:quote, :`].include?(to_execute.first)
+    return to_execute[1] if QUOTES.include?(to_execute.first)
     op = to_execute.first
 
     if op == :defn
@@ -60,13 +61,20 @@ class RlispExecutor
       return
     end
 
-    all = to_execute.
-      map { |i| i.is_a?(Array) ? execute(i) : i }.
-      select { |x| x }
+    all = execute_elements(to_execute)
 
-    return @available_methods[op].(all) if OPERATIONS.include?(op)
+    return OPERATIONS[op].(all) if OPERATIONS.include?(op)
+    return @available_methods[op].(all) if @available_methods.include?(op)
     return execute(all.first) if all.size == 1
 
     SIMPLE_SEND.(all)
+  end
+
+  private
+
+  def execute_elements(array)
+    array.
+      map { |i| i.is_a?(Array) ? execute(i) : i }.
+      select { |x| x }
   end
 end
