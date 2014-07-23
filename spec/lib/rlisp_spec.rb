@@ -17,7 +17,7 @@ describe '#Rlisp' do
     specify { expect { subject }.to_not raise_error }
 
     context 'with a ruby string' do
-      let(:thing_to_print) { "Hello world" }
+      let(:thing_to_print) { 'Hello world' }
 
       specify { expect { subject }.to output(thing_to_print+"\n").to_stdout }
     end
@@ -26,10 +26,17 @@ describe '#Rlisp' do
   context 'when executing a math operation' do
     subject { Rlisp { math_operation } }
 
-    context 'and that operation being [:+, 21, 21]' do
-      let(:math_operation) { [:+, 21, 21] }
+    {
+      [:+, 21, 21] => 42,
+      [:-, 63, 21] => 42,
+      [:*, 7, 6] => 42,
+      [:/, 84, 2] => 42,
+    }.each do |op, result|
+      context "and that operation being #{op.inspect}" do
+        let(:math_operation) { op }
 
-      it { is_expected.to eq(42) }
+        it { is_expected.to eq(result) }
+      end
     end
   end
 
