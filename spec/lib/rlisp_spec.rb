@@ -23,7 +23,40 @@ describe '#Rlisp' do
     end
   end
 
-  context 'when executing :quote' do
+  context 'when executing an if' do
+    subject { Rlisp { [:if, condition, true_value, false_value] } }
+
+    context 'when the true element is 42 and the false is 35' do
+      let(:true_value) { 42 }
+      let(:false_value) { 35 }
+
+      context 'when the condition is true' do
+        let(:condition) { true }
+
+        it { is_expected.to eq(true_value) }
+      end
+
+      context 'when the condition is false' do
+        let(:condition) { false }
+
+        it { is_expected.to eq(false_value) }
+      end
+    end
+  end
+
+  context 'when checking for identical-object equality' do
+    subject { Rlisp { [:eql, a, b] } }
+
+    context 'when the compared are the same object' do
+      let(:thing) { Object.new }
+      let(:a) { thing }
+      let(:b) { thing }
+
+        it { is_expected.to eq(true) }
+    end
+  end
+
+  context 'when executing a quote' do
     subject { Rlisp { [quote, quoted_entity] } }
 
     context 'when using the backtick symbol' do
