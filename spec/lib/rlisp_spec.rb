@@ -23,6 +23,25 @@ describe '#Rlisp' do
     end
   end
 
+  context 'when defining a function that addds two numbers' do
+    subject do
+      Rlisp do
+        [
+          [:defn, :add, [:a, :b], [:+, :a, :b]],
+          [:add, a, b]
+        ]
+      end
+    end
+
+    context 'and that function is passed 21 and 21' do
+      let(:a) { 21 }
+      let(:b) { 21 }
+
+      it { is_expected.to eq(42) }
+    end
+
+  end
+
   context 'when defining a function that doubles a number' do
     subject do
       Rlisp do
