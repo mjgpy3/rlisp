@@ -19,7 +19,8 @@ class RlispExecutor
     print: ->(x){ puts(*x[1..-1]) },
     if: ->(x){ x[1] ? x[2] : x[3] },
     eq: ->(x){ SIMPLE_SEND_MAPPED.(:equal?, x) },
-    eql:->(x){ SIMPLE_SEND_MAPPED.(:eql?, x) }
+    eql:->(x){ SIMPLE_SEND_MAPPED.(:eql?, x) },
+    range:->(x){ (x[1]..x[2]-1).to_a },
   }
 
   def execute(to_execute)

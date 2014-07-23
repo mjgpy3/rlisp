@@ -44,6 +44,17 @@ describe '#Rlisp' do
     end
   end
 
+  context 'when executing a range' do
+    subject { Rlisp { [:range, a, b] } }
+
+    context 'when going from 1 to 10' do
+      let(:a) { 1 }
+      let(:b) { 10 }
+
+      it { is_expected.to eq([1, 2, 3, 4, 5, 6, 7, 8, 9]) }
+    end
+  end
+
   context 'when checking for shallow equality' do
     subject { Rlisp { [:eql, a, b] } }
 
