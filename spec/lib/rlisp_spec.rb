@@ -46,6 +46,20 @@ describe '#Rlisp' do
 
   context 'when checking for shallow equality' do
     subject { Rlisp { [:eql, a, b] } }
+
+    context 'when the objects have the same value' do
+      let(:a) { 'foobar' }
+      let(:b) { 'foobar' }
+
+      it { is_expected.to eq(true) }
+    end
+
+    context 'when the objects have different values, but the same type' do
+      let(:a) { 'foobar' }
+      let(:b) { 'spameggs' }
+
+      it { is_expected.to eq(false) }
+    end
   end
 
   context 'when checking for identical-object equality' do
@@ -62,6 +76,13 @@ describe '#Rlisp' do
     context 'when the compared are different objects' do
       let(:a) { Object.new }
       let(:b) { Object.new }
+
+      it { is_expected.to eq(false) }
+    end
+
+    context 'when the compared things have the same value' do
+      let(:a) { 'foobar' }
+      let(:b) { 'foobar' }
 
       it { is_expected.to eq(false) }
     end
