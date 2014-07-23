@@ -52,7 +52,14 @@ describe '#Rlisp' do
       let(:a) { thing }
       let(:b) { thing }
 
-        it { is_expected.to eq(true) }
+      it { is_expected.to eq(true) }
+    end
+
+    context 'when the compared are different objects' do
+      let(:a) { Object.new }
+      let(:b) { Object.new }
+
+      it { is_expected.to eq(false) }
     end
   end
 
