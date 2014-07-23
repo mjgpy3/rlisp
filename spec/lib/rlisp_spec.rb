@@ -23,6 +23,19 @@ describe '#Rlisp' do
     end
   end
 
+  context 'when defining a function that returns 5 and calling it' do
+    subject do
+      Rlisp do
+        [
+          [:defn, :foo_func, [], 5],
+          [:foo_func]
+        ]
+      end
+    end
+
+    it { is_expected.to eq(5) }
+  end
+
   context 'when executing an if' do
     subject { Rlisp { [:if, condition, true_value, false_value] } }
 

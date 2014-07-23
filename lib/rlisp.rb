@@ -19,16 +19,27 @@ class RlispExecutor
     print: ->(x){ puts(*x[1..-1]) },
     if: ->(x){ x[1] ? x[2] : x[3] },
     eq: ->(x){ SIMPLE_SEND_MAPPED.(:equal?, x) },
-    eql:->(x){ SIMPLE_SEND_MAPPED.(:eql?, x) },
-    range:->(x){ (x[1]..x[2]-1).to_a },
+    eql: ->(x){ SIMPLE_SEND_MAPPED.(:eql?, x) },
+    range: ->(x){ (x[1]..x[2]-1).to_a }
   }
+
+  def initialize
+    @available_methods = OPERATIONS
+  end
 
   def execute(to_execute)
     return to_execute[1] if [:quote, :`].include?(to_execute.first)
+    op = to_execute.first
 
-    all = to_execute.map { |i| i.is_a?(Array) ? execute(i) : i }
-    op = all.first
+    if op == :defn
+      @available_methods[to_execute[1]] = ->(x){ to_execute[3] }
+      return
+    end
 
-    OPERATIONS.include?(op) ? OPERATIONS[op].(all) : SIMPLE_SEND.(all)
+    all = to_execute.
+      map { |i| i.is_a?(Array) ? execute(i) : i }.
+      select { |x| x }
+    return @available_methods[op].(all) if OPERATIONS.include?(op)
+    all.size == 1 ? all.first : SIMPLE_SEND.(all)
   end
 end
