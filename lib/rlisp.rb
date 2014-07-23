@@ -17,7 +17,7 @@ class RlispExecutor
     mod: ->(x){ SIMPLE_SEND.([:%] + x[1..-1]) },
     print: ->(x){ puts(*x[1..-1]) },
     if: ->(x){ x[1] ? x[2] : x[3] },
-    eql: ->(x){ SIMPLE_SEND.([:equal?] + x[1..-1]) }
+    eq: ->(x){ SIMPLE_SEND.([:equal?] + x[1..-1]) }
   }
 
   def execute(to_execute)

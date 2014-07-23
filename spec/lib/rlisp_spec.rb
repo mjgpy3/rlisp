@@ -44,8 +44,12 @@ describe '#Rlisp' do
     end
   end
 
-  context 'when checking for identical-object equality' do
+  context 'when checking for shallow equality' do
     subject { Rlisp { [:eql, a, b] } }
+  end
+
+  context 'when checking for identical-object equality' do
+    subject { Rlisp { [:eq, a, b] } }
 
     context 'when the compared are the same object' do
       let(:thing) { Object.new }
