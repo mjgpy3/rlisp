@@ -10,6 +10,28 @@ def Rlisp
   end
 end
 
+class CustomMethod
+  def initialize(array)
+    @array = array
+    @params = {}
+    @lookups = {}
+    array[2].each_with_index { |p, i| @params[i] = p }
+  end
+
+  def call(x)
+    x[1..-1].each_with_index { |v, i| @lookups[@params[i]] = v }
+    @array[3]
+  end
+
+  def name
+    @array[1]
+  end
+
+  def lookups
+    @lookups
+  end
+end
+
 class RlispExecutor
   SIMPLE_SEND = ->(x){ x[1].send(x.first, *x[2..-1]) }
   SIMPLE_SEND_MAPPED = ->(m, x){ SIMPLE_SEND.([m] + x[1..-1]) }
@@ -28,18 +50,23 @@ class RlispExecutor
   end
 
   def execute(to_execute)
+    return to_execute unless to_execute.is_a?(Array)
     return to_execute[1] if [:quote, :`].include?(to_execute.first)
     op = to_execute.first
 
     if op == :defn
-      @available_methods[to_execute[1]] = ->(x){ to_execute[3] }
+      method = CustomMethod.new(to_execute)
+      @available_methods[method.name] = method
       return
     end
 
     all = to_execute.
       map { |i| i.is_a?(Array) ? execute(i) : i }.
       select { |x| x }
+
     return @available_methods[op].(all) if OPERATIONS.include?(op)
-    all.size == 1 ? all.first : SIMPLE_SEND.(all)
+    return execute(all.first) if all.size == 1
+
+    SIMPLE_SEND.(all)
   end
 end

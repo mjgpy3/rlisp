@@ -23,11 +23,28 @@ describe '#Rlisp' do
     end
   end
 
+  context 'when defining a function that doubles a number' do
+    subject do
+      Rlisp do
+        [
+          [:defn, :double, [:num], [:*, :num, 2]],
+          [:double, value]
+        ]
+      end
+    end
+
+    context 'and that function is passed 21' do
+      let(:value) { 21 }
+
+      xit { is_expected.to eq(42) }
+    end
+  end
+
   context 'when defining a function that returns 5 and calling it' do
     subject do
       Rlisp do
         [
-          [:defn, :foo_func, [], 5],
+          [:defn, :foo_func, [], [5]],
           [:foo_func]
         ]
       end
