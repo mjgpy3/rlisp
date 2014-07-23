@@ -23,6 +23,30 @@ describe '#Rlisp' do
     end
   end
 
+  context 'when executing :quote' do
+    subject { Rlisp { [quote, quoted_entity] } }
+
+    context 'when using the backtick symbol' do
+      let(:quote) { :` }
+
+      context 'with an `Array`' do
+        let(:quoted_entity) { [:+, 21, 21] }
+
+        it { is_expected.to eq(quoted_entity) }
+      end
+    end
+
+    context 'when using the quote symbol' do
+      let(:quote) { :quote }
+
+      context 'with an `Array`' do
+        let(:quoted_entity) { [:+, 21, 21] }
+
+        it { is_expected.to eq(quoted_entity) }
+      end
+    end
+  end
+
   context 'when executing a math operation' do
     subject { Rlisp { math_operation } }
 
