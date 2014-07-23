@@ -2,7 +2,7 @@ def Rlisp
   to_execute = yield
 
   if to_execute.is_a?(Array)
-    RlispExecutor.new(to_execute).execute
+    RlispExecutor.new.execute(to_execute)
   elsif to_execute.nil?
     nil
   else
@@ -19,14 +19,12 @@ class RlispExecutor
     :- => SIMPLE_SEND,
     :* => SIMPLE_SEND,
     :/ => SIMPLE_SEND,
+    :mod => ->(x){ SIMPLE_SEND.([:%] + x[1..-1]) },
     print: ->(x){ puts(*x[1..-1]) }
   }
 
-  def initialize(execution_array)
-    @execute_me = execution_array
-  end
-
-  def execute
-    OPERATIONS[@execute_me.first].(@execute_me)
+  def execute(to_execute)
+    to_execute = to_execute.map { |i| i.is_a?(Array) ? execute(i) : i }
+    OPERATIONS[to_execute.first].(to_execute)
   end
 end

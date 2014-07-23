@@ -31,6 +31,8 @@ describe '#Rlisp' do
       [:-, 63, 21] => 42,
       [:*, 7, 6] => 42,
       [:/, 84, 2] => 42,
+      [:mod, 42, 45] => 42,
+      [:+, [:*, 7, 3], 21] => 42,
     }.each do |op, result|
       context "and that operation being #{op.inspect}" do
         let(:math_operation) { op }
