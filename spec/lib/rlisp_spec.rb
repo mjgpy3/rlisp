@@ -10,6 +10,12 @@ describe '#Rlisp' do
     it { is_expected.to be_nil }
   end
 
+  context 'when executing an empty array' do
+    subject { Rlisp { [] } }
+
+    it { is_expected.to eq([]) }
+  end
+
   context 'when executing a print list' do
     subject { Rlisp { [:print, thing_to_print] } }
     let(:thing_to_print) { 'foobar' }
