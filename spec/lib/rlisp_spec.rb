@@ -28,12 +28,12 @@ describe '#Rlisp' do
       Rlisp do
         [
           [:defn, :even, [:a], [:eql, [:mod, :a, 2], 0]],
-          [:filter, :even, [:`, [1, 2, 3, 4, 5]]]
+          [:filter, :even, [:`, [:range, 0, 11]]]
         ]
       end
     end
 
-    it { is_expected.to eq([2, 4]) }
+    it { is_expected.to eq([0, 2, 4, 6, 8, 10]) }
   end
 
   context 'when executing a map over a defined function' do
@@ -41,7 +41,7 @@ describe '#Rlisp' do
       Rlisp do
         [
           [:defn, :add_one, [:a], [:+, :a, 1]],
-          [:map, :add_one, [:`, [1, 2, 3]]]
+          [:map, :add_one, [:range, 1, 4]]
         ]
       end
     end
