@@ -16,6 +16,19 @@ describe '#Rlisp' do
     it { is_expected.to eq([]) }
   end
 
+  context 'when executing a filter over a map over a range' do
+    subject do
+      Rlisp do
+        [
+          [:defn, :square, [:number], [:*, :number, :number]],
+          [:filter, :even?, [:map, :square, [:range, 1, 5]]]
+        ]
+      end
+    end
+
+    it { is_expected.to eq([4, 16]) }
+  end
+
   context 'when executing a print list' do
     subject { Rlisp { [:print, thing_to_print] } }
     let(:thing_to_print) { 'foobar' }
