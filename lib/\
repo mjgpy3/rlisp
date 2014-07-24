@@ -59,8 +59,9 @@ class RlispExecutor
   def execute(to_execute, lookups = {})
     return to_execute unless to_execute.is_a?(Array)
     return to_execute[1] if quoted?(to_execute.first)
+    op = to_execute.first
 
-    if to_execute.first == :defn
+    if op == :defn
       create_method(to_execute)
       return
     end
