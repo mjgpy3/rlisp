@@ -5,8 +5,6 @@ describe '#Rlisp' do
   context 'when executing an empty block' do
     subject { Rlisp {} }
 
-    specify { expect { subject }.to_not raise_error }
-
     it { is_expected.to be_nil }
   end
 
@@ -48,7 +46,7 @@ describe '#Rlisp' do
     end
   end
 
-  context 'when executing a filter over a map over a range' do
+  context 'when executing a filter over a map over a range, using a defined function' do
     subject do
       Rlisp do
         [
