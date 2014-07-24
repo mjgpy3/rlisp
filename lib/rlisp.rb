@@ -43,7 +43,9 @@ class RlispExecutor
     if: ->(x){ x[1] ? x[2] : x[3] },
     eq: ->(x){ SIMPLE_SEND_MAPPED.(:equal?, x) },
     eql: ->(x){ SIMPLE_SEND_MAPPED.(:eql?, x) },
-    range: ->(x){ (x[1]..x[2]-1).to_a }
+    range: ->(x){ (x[1]..x[2]-1).to_a },
+    and: ->(x){ x[1] && x[2] },
+    or: ->(x){ x[1] || x[2] }
   }
 
   def initialize
@@ -56,10 +58,6 @@ class RlispExecutor
     op = to_execute.first
 
     case op
-    when :and
-      to_execute = [execute(to_execute[1]) && execute(to_execute[2])]
-    when :or
-      to_execute = [execute(to_execute[1]) || execute(to_execute[2])]
     when :map
       to_execute = execute(to_execute[2..-1]).map { |x| [to_execute[1], x] }
     when :filter
