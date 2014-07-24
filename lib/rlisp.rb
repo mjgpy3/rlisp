@@ -55,12 +55,12 @@ class RlispExecutor
     return to_execute[1] if QUOTES.include?(to_execute.first)
     op = to_execute.first
 
-    if op == :map
+    case op
+    when :map
       to_execute = to_execute[2].map { |x| execute([to_execute[1], x]) }
-      p to_execute
-    end
-
-    if op == :defn
+    when :filter
+      to_execute = to_execute[2].select { |x| execute([to_execute[1], x]) }
+    when :defn
       method = CustomMethod.new(to_execute)
       @available_methods[method.name] = method
       return

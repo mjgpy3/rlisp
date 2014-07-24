@@ -23,6 +23,19 @@ describe '#Rlisp' do
     end
   end
 
+  context 'when executing a filter over a defined function' do
+    subject do
+      Rlisp do
+        [
+          [:defn, :even, [:a], [:eql, [:mod, :a, 2], 0]],
+          [:filter, :even, [1, 2, 3, 4, 5]]
+        ]
+      end
+    end
+
+    it { is_expected.to eq([2, 4]) }
+  end
+
   context 'when executing a map over a defined function' do
     subject do
       Rlisp do
