@@ -55,6 +55,11 @@ class RlispExecutor
     return to_execute[1] if QUOTES.include?(to_execute.first)
     op = to_execute.first
 
+    if op == :map
+      to_execute = to_execute[2].map { |x| execute([to_execute[1], x]) }
+      p to_execute
+    end
+
     if op == :defn
       method = CustomMethod.new(to_execute)
       @available_methods[method.name] = method
@@ -69,7 +74,7 @@ class RlispExecutor
     return execute(method.(all), method.lookups) if method
     return execute(all.first, lookups) if all.size == 1
 
-    SIMPLE_SEND.(all)
+    all.first.is_a?(Symbol) ? SIMPLE_SEND.(all) : all
   end
 
   private

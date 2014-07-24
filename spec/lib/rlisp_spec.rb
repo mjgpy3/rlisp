@@ -23,6 +23,19 @@ describe '#Rlisp' do
     end
   end
 
+  context 'when executing a map over a defined function' do
+    subject do
+      Rlisp do
+        [
+          [:defn, :add_one, [:a], [:+, :a, 1]],
+          [:map, :add_one, [1, 2, 3]]
+        ]
+      end
+    end
+
+    it { is_expected.to eq([2, 3, 4]) }
+  end
+
   context 'when defining a function that performs a non-simple operation' do
     subject do
       Rlisp do
