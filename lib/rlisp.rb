@@ -62,13 +62,12 @@ class RlispExecutor
     end
 
     all = execute_elements(to_execute, lookups)
+    all.map! { |x| lookups.include?(x) ? lookups[x] : x}
 
     return OPERATIONS[op].(all) if OPERATIONS.include?(op)
     method = @available_methods[op]
     return execute(method.(all), method.lookups) if method
     return execute(all.first, lookups) if all.size == 1
-
-    all.map! { |x| lookups.include?(x) ? lookups[x] : x}
 
     SIMPLE_SEND.(all)
   end

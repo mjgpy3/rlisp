@@ -23,6 +23,24 @@ describe '#Rlisp' do
     end
   end
 
+  context 'when defining a function that performs a non-simple operation' do
+    subject do
+      Rlisp do
+        [
+          [:defn, :div_by, [:a, :b], [:eql, 0, [:mod, :a, :b]]],
+          [:div_by, a, b]
+        ]
+      end
+    end
+
+    context 'and it is given some params' do
+      let(:a) { 15 }
+      let(:b) { 5 }
+
+      it { is_expected.to be(true) }
+    end
+  end
+
   context 'when defining a function that addds two numbers' do
     subject do
       Rlisp do
