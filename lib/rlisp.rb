@@ -71,18 +71,24 @@ class RlispExecutor
   private
 
   def execute_and_perform_lookups(array, lookups)
+    after_evaluating_level(array, lookups) do |op, all|
+      return OPERATIONS[op].(all) if OPERATIONS.include?(op)
+      method = @available_methods[op]
+      return execute(method.(all), method.lookups) if method
+      return execute(all.first, lookups) if all.size == 1
+
+      all.first.is_a?(Symbol) ? SIMPLE_SEND.(all) : all
+    end
+  end
+
+  def after_evaluating_level(array, lookups)
     op = array.first
     array = @special_methods[op].(array) if @special_methods[op]
 
     all = execute_elements(array, lookups).
       map { |x| lookups.include?(x) ? lookups[x] : x}
 
-    return OPERATIONS[op].(all) if OPERATIONS.include?(op)
-    method = @available_methods[op]
-    return execute(method.(all), method.lookups) if method
-    return execute(all.first, lookups) if all.size == 1
-
-    all.first.is_a?(Symbol) ? SIMPLE_SEND.(all) : all
+    yield(op, all)
   end
 
   def quoted?(thing)
