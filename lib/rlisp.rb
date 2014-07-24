@@ -57,9 +57,9 @@ class RlispExecutor
 
     case op
     when :map
-      to_execute = to_execute[2].map { |x| execute([to_execute[1], x]) }
+      to_execute = execute(to_execute[2..-1]).map { |x| [to_execute[1], x] }
     when :filter
-      to_execute = to_execute[2].select { |x| execute([to_execute[1], x]) }
+      to_execute = execute(to_execute[2..-1]).select { |x| execute([to_execute[1], x]) }
     when :defn
       method = CustomMethod.new(to_execute)
       @available_methods[method.name] = method

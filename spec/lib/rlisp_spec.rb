@@ -28,7 +28,7 @@ describe '#Rlisp' do
       Rlisp do
         [
           [:defn, :even, [:a], [:eql, [:mod, :a, 2], 0]],
-          [:filter, :even, [1, 2, 3, 4, 5]]
+          [:filter, :even, [:`, [1, 2, 3, 4, 5]]]
         ]
       end
     end
@@ -41,7 +41,7 @@ describe '#Rlisp' do
       Rlisp do
         [
           [:defn, :add_one, [:a], [:+, :a, 1]],
-          [:map, :add_one, [1, 2, 3]]
+          [:map, :add_one, [:`, [1, 2, 3]]]
         ]
       end
     end
