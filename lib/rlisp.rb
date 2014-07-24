@@ -56,13 +56,16 @@ class RlispExecutor
     op = to_execute.first
 
     case op
+    when :and
+      p to_execute
+      to_execute = [execute(to_execute[1]) && execute(to_execute[2])]
+      p to_execute
     when :map
       to_execute = execute(to_execute[2..-1]).map { |x| [to_execute[1], x] }
     when :filter
       to_execute = execute(to_execute[2..-1]).select { |x| execute([to_execute[1], x]) }
     when :defn
-      method = CustomMethod.new(to_execute)
-      @available_methods[method.name] = method
+      create_method(to_execute)
       return
     end
 
@@ -79,9 +82,14 @@ class RlispExecutor
 
   private
 
+  def create_method(array)
+      method = CustomMethod.new(array)
+      @available_methods[method.name] = method
+  end
+
   def execute_elements(array, lookups)
     array.
       map { |i| i.is_a?(Array) ? execute(i, lookups) : i }.
-      select { |x| x }
+      select { |x| !x.nil? }
   end
 end

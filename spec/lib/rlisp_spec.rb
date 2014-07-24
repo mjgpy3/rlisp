@@ -36,6 +36,24 @@ describe '#Rlisp' do
     it { is_expected.to eq([0, 2, 4, 6, 8, 10]) }
   end
 
+  context 'when executing an `and`' do
+    subject { Rlisp { [:and, a, b] } }
+
+    {
+      true => true,
+      false => false,
+      true => true,
+      false => true
+    }.each do |f, s|
+      context "with #{f} and #{s}" do
+        let(:a) { f }
+        let(:b) { s }
+
+        it { is_expected.to eq(a && b) }
+      end
+    end
+  end
+
   context 'when executing a map over a defined function' do
     subject do
       Rlisp do
