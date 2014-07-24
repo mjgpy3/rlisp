@@ -35,5 +35,6 @@ end
  - `range` for generating a range of numbers
  - Standard equality checkers `eq` and `eql` (not confusing at all)
  - A ruby fallback, so if your ruby method is defined somewhere, it may just work!
+ - a print function (really just ruby's `puts`, shhhh)
 
 See `./spec/lib/rlisp_spec.rb` for proven, working examples!
