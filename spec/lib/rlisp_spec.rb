@@ -22,6 +22,12 @@ describe '#Rlisp' do
     it { is_expected.to eq(42) }
   end
 
+  context 'when executing tail on an array' do
+    subject { Rlisp { [:tail, [42, 43, 44]] } }
+
+    it { is_expected.to eq([43, 44]) }
+  end
+
   context 'when executing a filter over a map over a range' do
     subject do
       Rlisp do
