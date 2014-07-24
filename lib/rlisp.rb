@@ -57,9 +57,9 @@ class RlispExecutor
 
     case op
     when :and
-      p to_execute
       to_execute = [execute(to_execute[1]) && execute(to_execute[2])]
-      p to_execute
+    when :or
+      to_execute = [execute(to_execute[1]) || execute(to_execute[2])]
     when :map
       to_execute = execute(to_execute[2..-1]).map { |x| [to_execute[1], x] }
     when :filter
