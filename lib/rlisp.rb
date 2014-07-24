@@ -16,6 +16,7 @@ class CustomMethod
     @params = {}
     @lookups = {}
     array[2].each_with_index { |p, i| @params[i] = p }
+    p array
   end
 
   def call(x)

@@ -60,6 +60,24 @@ describe '#Rlisp' do
     it { is_expected.to eq([4, 16]) }
   end
 
+  context 'when executing a defined, recursive function' do
+    subject do
+      Rlisp do
+        [
+          [:defn, :sub_till_one, [:x],
+            [:if, [:eql, :x, 1],
+              1,
+              [:sub_till_one, [:-, :x, 1]]
+            ]
+          ],
+          [:sub_till_one, 42]
+        ]
+      end
+    end
+
+    xit { is_expected.to eq(1) }
+  end
+
   context 'when executing a print list' do
     subject { Rlisp { [:print, thing_to_print] } }
     let(:thing_to_print) { 'foobar' }
