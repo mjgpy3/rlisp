@@ -11,6 +11,7 @@ describe '#Rlisp' do
   {
     [:head, [42, 43, 44]] => 42,
     [:tail, [42, 43, 44]] => [43, 44],
+    [:cons, 42, [43, 44]] => [42, 43, 44],
     [:map, :even?, [:range, 1, 4]] => [false, true, false],
     [:filter, :even?, [:range, 1, 5]] => [2, 4],
     [:if, true, 42, 43] => 42,

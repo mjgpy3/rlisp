@@ -47,7 +47,8 @@ class RlispExecutor
     and: ->(x){ x[1] && x[2] },
     or: ->(x){ x[1] || x[2] },
     head: ->(x){ x[1].first },
-    tail: ->(x){ x[1].drop(1) }
+    tail: ->(x){ x[1].drop(1) },
+    cons: ->(x){ x[2].unshift(x[1]) },
   }
 
   def initialize
