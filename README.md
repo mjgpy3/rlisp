@@ -36,5 +36,6 @@ end
  - Standard equality checkers `eq` and `eql` (not confusing at all)
  - A ruby fallback, so if your ruby method is defined somewhere, it may just work!
  - a print function (really just ruby's `puts`, shhhh)
+ - An `if` conditional, so you can work that logical magic
 
 See `./spec/lib/rlisp_spec.rb` for proven, working examples!
