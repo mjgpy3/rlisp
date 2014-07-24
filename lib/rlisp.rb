@@ -45,7 +45,8 @@ class RlispExecutor
     eql: ->(x){ SIMPLE_SEND_MAPPED.(:eql?, x) },
     range: ->(x){ (x[1]..x[2]-1).to_a },
     and: ->(x){ x[1] && x[2] },
-    or: ->(x){ x[1] || x[2] }
+    or: ->(x){ x[1] || x[2] },
+    head: ->(x){ x[1].first }
   }
 
   def initialize
