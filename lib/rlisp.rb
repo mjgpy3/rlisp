@@ -46,9 +46,9 @@ class RlispExecutor
     range: ->(x){ (x[1]..x[2]-1).to_a },
     and: ->(x){ x[1] && x[2] },
     or: ->(x){ x[1] || x[2] },
-    head: ->(x){ x[1].first },
-    tail: ->(x){ x[1].drop(1) },
-    cons: ->(x){ x[2].unshift(x[1]) },
+    head: ->(x){ SIMPLE_SEND_MAPPED.(:first, x) },
+    tail: ->(x){ SIMPLE_SEND_MAPPED.(:drop, x[0..1]+[1]) },
+    cons: ->(x){ SIMPLE_SEND_MAPPED.(:unshift, [x[0], x[2], x[1]]) },
   }
 
   def initialize
