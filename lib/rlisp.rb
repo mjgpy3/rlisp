@@ -38,7 +38,7 @@ class RlispExecutor
   QUOTES = [:quote, :`]
 
   OPERATIONS = {
-    mod: ->(x){ SIMPLE_SEND.([:%] + x[1..-1]) },
+    mod: ->(x){ SIMPLE_SEND_MAPPED.(:%, x) },
     print: ->(x){ puts(*x[1..-1]) },
     if: ->(x){ x[1] ? x[2] : x[3] },
     eq: ->(x){ SIMPLE_SEND_MAPPED.(:equal?, x) },
