@@ -39,3 +39,6 @@ end
  - An `if` conditional, so you can work that logical magic
 
 See `./spec/lib/rlisp_spec.rb` for proven, working examples!
+
+## TODO
+ - recursion is broken...
