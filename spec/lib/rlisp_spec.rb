@@ -5,18 +5,49 @@ describe '#Rlisp' do
   context 'when executing an empty block' do
     subject { Rlisp {} }
 
-    specify { expect { subject }.to_not raise_error }
-
     it { is_expected.to be_nil }
   end
 
-  context 'when executing an empty array' do
-    subject { Rlisp { [] } }
+  {
+    [:head, [42, 43, 44]] => 42,
+    [:tail, [42, 43, 44]] => [43, 44],
+    [:cons, 42, [43, 44]] => [42, 43, 44],
+    [:map, :even?, [:range, 1, 4]] => [false, true, false],
+    [:filter, :even?, [:range, 1, 5]] => [2, 4],
+    [:if, true, 42, 43] => 42,
+    [:if, false, 42, 43] => 43,
+    [:range, 1, 10] => [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    [:eql, 'foobar', 'foobar'] => true,
+    [:eql, 'foobar', 'spameggs'] => false,
+    [:eq, 'foobar', 'foobar'] => false,
+    [:eq, 42, 42] => true,
+    [:quote, [:+, 21, 21]] => [:+, 21, 21],
+    [:`, [:+, 21, 21]] => [:+, 21, 21],
+    [:+, 21, 21] => 42,
+    [:-, 63, 21] => 42,
+    [:*, 7, 6] => 42,
+    [:/, 84, 2] => 42,
+    [:mod, 42, 45] => 42,
+    [:+, [:*, 7, 3], 21] => 42,
+    [:+, [:*, [:+, 3, 4], 3], 21] => 42,
+    [] => [],
+    [:or, true, true] => true,
+    [:or, false, true] => true,
+    [:or, true, false] => true,
+    [:or, false, false] => false,
+    [:and, true, true] => true,
+    [:and, false, true] => false,
+    [:and, true, false] => false,
+    [:and, false, false] => false,
+  }.each do |code, result|
+    context "when executing #{code}" do
+      subject { Rlisp { code } }
 
-    it { is_expected.to eq([]) }
+      it { is_expected.to eq(result) }
+    end
   end
 
-  context 'when executing a filter over a map over a range' do
+  context 'when executing a filter over a map over a range, using a defined function' do
     subject do
       Rlisp do
         [
@@ -29,11 +60,27 @@ describe '#Rlisp' do
     it { is_expected.to eq([4, 16]) }
   end
 
+  context 'when executing a defined, recursive function' do
+    subject do
+      Rlisp do
+        [
+          [:defn, :sub_till_one, [:x],
+            [:if, [:eql, :x, 1],
+              1,
+              [:sub_till_one, [:-, :x, 1]]
+            ]
+          ],
+          [:sub_till_one, 42]
+        ]
+      end
+    end
+
+    xit { is_expected.to eq(1) }
+  end
+
   context 'when executing a print list' do
     subject { Rlisp { [:print, thing_to_print] } }
     let(:thing_to_print) { 'foobar' }
-
-    specify { expect { subject }.to_not raise_error }
 
     context 'with a ruby string' do
       let(:thing_to_print) { 'Hello world' }
@@ -91,19 +138,6 @@ describe '#Rlisp' do
     end
   end
 
-  context 'when executing a map over a defined function' do
-    subject do
-      Rlisp do
-        [
-          [:defn, :add_one, [:a], [:+, :a, 1]],
-          [:map, :add_one, [:range, 1, 4]]
-        ]
-      end
-    end
-
-    it { is_expected.to eq([2, 3, 4]) }
-  end
-
   context 'when defining a function that performs a non-simple operation' do
     subject do
       Rlisp do
@@ -122,7 +156,7 @@ describe '#Rlisp' do
     end
   end
 
-  context 'when defining a function that addds two numbers' do
+  context 'when defining a function that adds two numbers' do
     subject do
       Rlisp do
         [
@@ -169,126 +203,6 @@ describe '#Rlisp' do
     end
 
     it { is_expected.to eq(5) }
-  end
-
-  context 'when executing an if' do
-    subject { Rlisp { [:if, condition, true_value, false_value] } }
-
-    context 'when the true element is 42 and the false is 35' do
-      let(:true_value) { 42 }
-      let(:false_value) { 35 }
-
-      context 'when the condition is true' do
-        let(:condition) { true }
-
-        it { is_expected.to eq(true_value) }
-      end
-
-      context 'when the condition is false' do
-        let(:condition) { false }
-
-        it { is_expected.to eq(false_value) }
-      end
-    end
-  end
-
-  context 'when executing a range' do
-    subject { Rlisp { [:range, a, b] } }
-
-    context 'when going from 1 to 10' do
-      let(:a) { 1 }
-      let(:b) { 10 }
-
-      it { is_expected.to eq([1, 2, 3, 4, 5, 6, 7, 8, 9]) }
-    end
-  end
-
-  context 'when checking for shallow equality' do
-    subject { Rlisp { [:eql, a, b] } }
-
-    context 'when the objects have the same value' do
-      let(:a) { 'foobar' }
-      let(:b) { 'foobar' }
-
-      it { is_expected.to eq(true) }
-    end
-
-    context 'when the objects have different values, but the same type' do
-      let(:a) { 'foobar' }
-      let(:b) { 'spameggs' }
-
-      it { is_expected.to eq(false) }
-    end
-  end
-
-  context 'when checking for identical-object equality' do
-    subject { Rlisp { [:eq, a, b] } }
-
-    context 'when the compared are the same object' do
-      let(:thing) { Object.new }
-      let(:a) { thing }
-      let(:b) { thing }
-
-      it { is_expected.to eq(true) }
-    end
-
-    context 'when the compared are different objects' do
-      let(:a) { Object.new }
-      let(:b) { Object.new }
-
-      it { is_expected.to eq(false) }
-    end
-
-    context 'when the compared things have the same value' do
-      let(:a) { 'foobar' }
-      let(:b) { 'foobar' }
-
-      it { is_expected.to eq(false) }
-    end
-  end
-
-  context 'when executing a quote' do
-    subject { Rlisp { [quote, quoted_entity] } }
-
-    context 'when using the backtick symbol' do
-      let(:quote) { :` }
-
-      context 'with an `Array`' do
-        let(:quoted_entity) { [:+, 21, 21] }
-
-        it { is_expected.to eq(quoted_entity) }
-      end
-    end
-
-    context 'when using the quote symbol' do
-      let(:quote) { :quote }
-
-      context 'with an `Array`' do
-        let(:quoted_entity) { [:+, 21, 21] }
-
-        it { is_expected.to eq(quoted_entity) }
-      end
-    end
-  end
-
-  context 'when executing a math operation' do
-    subject { Rlisp { math_operation } }
-
-    {
-      [:+, 21, 21] => 42,
-      [:-, 63, 21] => 42,
-      [:*, 7, 6] => 42,
-      [:/, 84, 2] => 42,
-      [:mod, 42, 45] => 42,
-      [:+, [:*, 7, 3], 21] => 42,
-      [:+, [:*, [:+, 3, 4], 3], 21] => 42,
-    }.each do |op, result|
-      context "and that operation being #{op.inspect}" do
-        let(:math_operation) { op }
-
-        it { is_expected.to eq(result) }
-      end
-    end
   end
 
   [
