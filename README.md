@@ -1,5 +1,6 @@
 rlisp
 =====
+[![Build Status](https://travis-ci.org/mjgpy3/rlisp.svg?branch=master)](https://travis-ci.org/mjgpy3/rlisp)
 
 Probably the worst gem/DSL/idea for ruby ever. A lisp-like language as a DSL! Very WIP.
 
