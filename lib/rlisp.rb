@@ -89,6 +89,7 @@ class RlispExecutor
   def execute_and_perform_lookups(array, lookups)
     after_evaluating_level(array, lookups) do |op, all|
       method = @available_methods[op]
+      return execute(method.(all)) if method.is_a?(Proc)
       return execute(method.(all), method.lookups) if method
       return execute(all.first, lookups) if all.size == 1
 
