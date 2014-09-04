@@ -21,7 +21,7 @@ def defn_lisp_core_functions(executor)
     .add_method(:range, ->(x){ (x[1]..x[2]-1).to_a })
     .add_method(:and, ->(x){ x[1] && x[2] })
     .add_method(:or, ->(x){ x[1] || x[2] })
-    .add_method(:head, ->(x){ x.first })
+    .add_method(:head, ->(x){ x[1].first })
     .add_method(:tail, ->(x){ simple_send_mapped(:drop, x[0..1]+[1]) })
     .add_method(:cons, ->(x){ simple_send_mapped(:unshift, [x[0], x[2], x[1]]) })
 end
