@@ -13,17 +13,17 @@ def Rlisp
 end
 
 def defn_lisp_core_functions(executor)
-  executor.add_method(:mod, ->(x){ simple_send_mapped.(:%, x) })
+  executor.add_method(:mod, ->(x){ simple_send_mapped(:%, x) })
     .add_method(:print, ->(x){ puts(*x[1..-1]) })
     .add_method(:if, ->(x){ x[1] ? x[2] : x[3] })
-    .add_method(:eq, ->(x){ simple_send_mapped.(:equal?, x) })
-    .add_method(:eql, ->(x){ simple_send_mapped.(:eql?, x) })
+    .add_method(:eq, ->(x){ simple_send_mapped(:equal?, x) })
+    .add_method(:eql, ->(x){ simple_send_mapped(:eql?, x) })
     .add_method(:range, ->(x){ (x[1]..x[2]-1).to_a })
     .add_method(:and, ->(x){ x[1] && x[2] })
     .add_method(:or, ->(x){ x[1] || x[2] })
-    .add_method(:head, ->(x){ simple_send_mapped.(:first, x) })
-    .add_method(:tail, ->(x){ simple_send_mapped.(:drop, x[0..1]+[1]) })
-    .add_method(:cons, ->(x){ simple_send_mapped.(:unshift, [x[0], x[2], x[1]]) })
+    .add_method(:head, ->(x){ x.first })
+    .add_method(:tail, ->(x){ simple_send_mapped(:drop, x[0..1]+[1]) })
+    .add_method(:cons, ->(x){ simple_send_mapped(:unshift, [x[0], x[2], x[1]]) })
 end
 
 class CustomMethod
@@ -53,7 +53,7 @@ def simple_send(x)
 end
 
 def simple_send_mapped(m, x)
-  simple_send.([m] + x[1..-1])
+  simple_send([m] + x[1..-1])
 end
 
 class RlispExecutor
@@ -89,10 +89,10 @@ class RlispExecutor
   def execute_and_perform_lookups(array, lookups)
     after_evaluating_level(array, lookups) do |op, all|
       method = @available_methods[op]
-      return execute(method.(all), method.lookups) if method
+      return execute(method(all), method.lookups) if method
       return execute(all.first, lookups) if all.size == 1
 
-      all.first.is_a?(Symbol) ? simple_send.(all) : all
+      all.first.is_a?(Symbol) ? simple_send(all) : all
     end
   end
 
