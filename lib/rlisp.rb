@@ -2,12 +2,28 @@ def Rlisp
   to_execute = yield
 
   if to_execute.is_a?(Array)
-    RlispExecutor.new.execute(to_execute)
+    executor = RlispExecutor.new
+    defn_lisp_core_functions(executor)
+    executor.execute(to_execute)
   elsif to_execute.nil?
     nil
   else
     fail 'Must be given an Array'
   end
+end
+
+def defn_lisp_core_functions(executor)
+  executor.add_method(:mod, ->(x){ simple_send_mapped.(:%, x) })
+    .add_method(:print, ->(x){ puts(*x[1..-1]) })
+    .add_method(:if, ->(x){ x[1] ? x[2] : x[3] })
+    .add_method(:eq, ->(x){ simple_send_mapped.(:equal?, x) })
+    .add_method(:eql, ->(x){ simple_send_mapped.(:eql?, x) })
+    .add_method(:range, ->(x){ (x[1]..x[2]-1).to_a })
+    .add_method(:and, ->(x){ x[1] && x[2] })
+    .add_method(:or, ->(x){ x[1] || x[2] })
+    .add_method(:head, ->(x){ simple_send_mapped.(:first, x) })
+    .add_method(:tail, ->(x){ simple_send_mapped.(:drop, x[0..1]+[1]) })
+    .add_method(:cons, ->(x){ simple_send_mapped.(:unshift, [x[0], x[2], x[1]]) })
 end
 
 class CustomMethod
@@ -32,27 +48,19 @@ class CustomMethod
   end
 end
 
+def simple_send(x)
+  x[1].send(x.first, *x[2..-1])
+end
+
+def simple_send_mapped(m, x)
+  simple_send.([m] + x[1..-1])
+end
+
 class RlispExecutor
-  SIMPLE_SEND = ->(x){ x[1].send(x.first, *x[2..-1]) }
-  SIMPLE_SEND_MAPPED = ->(m, x){ SIMPLE_SEND.([m] + x[1..-1]) }
   QUOTES = [:quote, :`]
 
-  OPERATIONS = {
-    mod: ->(x){ SIMPLE_SEND_MAPPED.(:%, x) },
-    print: ->(x){ puts(*x[1..-1]) },
-    if: ->(x){ x[1] ? x[2] : x[3] },
-    eq: ->(x){ SIMPLE_SEND_MAPPED.(:equal?, x) },
-    eql: ->(x){ SIMPLE_SEND_MAPPED.(:eql?, x) },
-    range: ->(x){ (x[1]..x[2]-1).to_a },
-    and: ->(x){ x[1] && x[2] },
-    or: ->(x){ x[1] || x[2] },
-    head: ->(x){ SIMPLE_SEND_MAPPED.(:first, x) },
-    tail: ->(x){ SIMPLE_SEND_MAPPED.(:drop, x[0..1]+[1]) },
-    cons: ->(x){ SIMPLE_SEND_MAPPED.(:unshift, [x[0], x[2], x[1]]) },
-  }
-
   def initialize
-    @available_methods = OPERATIONS.clone
+    @available_methods = {}
     @special_methods = {
       map: ->(x){ execute(x[2..-1]).map { |i| execute([x[1], i]) } },
       filter: ->(x){ execute(x[2..-1]).select { |i| execute([x[1], i]) } }
@@ -64,23 +72,27 @@ class RlispExecutor
     return to_execute[1] if quoted?(to_execute.first)
 
     if to_execute.first == :defn
-      create_method(to_execute)
+      create_method_from_array(to_execute)
       return
     end
 
     execute_and_perform_lookups(to_execute, lookups)
   end
 
+  def add_method(name, method)
+    @available_methods[name] = method
+    return self
+  end
+
   private
 
   def execute_and_perform_lookups(array, lookups)
     after_evaluating_level(array, lookups) do |op, all|
-      return OPERATIONS[op].(all) if OPERATIONS.include?(op)
       method = @available_methods[op]
       return execute(method.(all), method.lookups) if method
       return execute(all.first, lookups) if all.size == 1
 
-      all.first.is_a?(Symbol) ? SIMPLE_SEND.(all) : all
+      all.first.is_a?(Symbol) ? simple_send.(all) : all
     end
   end
 
@@ -98,9 +110,9 @@ class RlispExecutor
     QUOTES.include?(thing)
   end
 
-  def create_method(array)
-      method = CustomMethod.new(array)
-      @available_methods[method.name] = method
+  def create_method_from_array(array)
+    method = CustomMethod.new(array)
+    add_method(method.name, method)
   end
 
   def execute_elements(array, lookups)
