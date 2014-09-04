@@ -22,8 +22,8 @@ def defn_lisp_core_functions(executor)
     .add_method(:and, ->(x){ x[1] && x[2] })
     .add_method(:or, ->(x){ x[1] || x[2] })
     .add_method(:head, ->(x){ x[1].first })
-    .add_method(:tail, ->(x){ simple_send_mapped(:drop, x[0..1]+[1]) })
-    .add_method(:cons, ->(x){ simple_send_mapped(:unshift, [x[0], x[2], x[1]]) })
+    .add_method(:tail, ->(x){ x[1].drop(1) })
+    .add_method(:cons, ->(x){ x[2].unshift(x[1]) })
 end
 
 class CustomMethod
@@ -46,14 +46,6 @@ class CustomMethod
   def name
     @array[1]
   end
-end
-
-def simple_send(x)
-  x[1].send(x.first, *x[2..-1])
-end
-
-def simple_send_mapped(m, x)
-  simple_send([m] + x[1..-1])
 end
 
 class RlispExecutor
@@ -81,7 +73,7 @@ class RlispExecutor
 
   def add_method(name, method)
     @available_methods[name] = method
-    return self
+    self
   end
 
   private
@@ -93,7 +85,7 @@ class RlispExecutor
       return execute(method.(all), method.lookups) if method.is_a?(CustomMethod)
       return execute(all.first, lookups) if all.size == 1
 
-      all.first.is_a?(Symbol) ? simple_send(all) : all
+      all.first.is_a?(Symbol) ? all[1].send(all.first, *all[2..-1]) : all
     end
   end
 
