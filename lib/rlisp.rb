@@ -13,11 +13,11 @@ def Rlisp
 end
 
 def defn_lisp_core_functions(executor)
-  executor.add_method(:mod, ->(x){ simple_send_mapped(:%, x) })
+  executor.add_method(:mod, ->(x){ x[1] % x[2] })
     .add_method(:print, ->(x){ puts(*x[1..-1]) })
     .add_method(:if, ->(x){ x[1] ? x[2] : x[3] })
-    .add_method(:eq, ->(x){ simple_send_mapped(:equal?, x) })
-    .add_method(:eql, ->(x){ simple_send_mapped(:eql?, x) })
+    .add_method(:eq, ->(x){ x[1].equal?(x[2]) })
+    .add_method(:eql, ->(x){ x[1].eql?(x[2]) })
     .add_method(:range, ->(x){ (x[1]..x[2]-1).to_a })
     .add_method(:and, ->(x){ x[1] && x[2] })
     .add_method(:or, ->(x){ x[1] || x[2] })
@@ -45,12 +45,6 @@ class CustomMethod
 
   def name
     @array[1]
-  end
-end
-
-class Proc
-  def lookups
-    {}
   end
 end
 
@@ -95,7 +89,8 @@ class RlispExecutor
   def execute_and_perform_lookups(array, lookups)
     after_evaluating_level(array, lookups) do |op, all|
       method = @available_methods[op]
-      return execute(method.(all), method.lookups) if method
+      return execute(method.(all)) if method.is_a?(Proc)
+      return execute(method.(all), method.lookups) if method.is_a?(CustomMethod)
       return execute(all.first, lookups) if all.size == 1
 
       all.first.is_a?(Symbol) ? simple_send(all) : all
