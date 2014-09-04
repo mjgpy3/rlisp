@@ -48,6 +48,12 @@ class CustomMethod
   end
 end
 
+class Proc
+  def lookups
+    {}
+  end
+end
+
 def simple_send(x)
   x[1].send(x.first, *x[2..-1])
 end
@@ -89,8 +95,7 @@ class RlispExecutor
   def execute_and_perform_lookups(array, lookups)
     after_evaluating_level(array, lookups) do |op, all|
       method = @available_methods[op]
-      return execute(method.(all)) if method.is_a?(Proc)
-      return execute(method.(all), method.lookups) if method.is_a?(CustomMethod)
+      return execute(method.(all), method.lookups) if method
       return execute(all.first, lookups) if all.size == 1
 
       all.first.is_a?(Symbol) ? simple_send(all) : all
